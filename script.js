@@ -990,8 +990,7 @@
               class="whatsapp-button"
               id="sendWhatsApp"
             >
-              <span class="whatsapp-symbol">â—‰</span>
-              Anfrage Ã¼ber WhatsApp senden
+              <span class="whatsapp-symbol">â—‰</span>Termin per WhatsApp senden
             </button>
   
             <button
@@ -1881,3 +1880,4 @@
     );
   
   })();
+
