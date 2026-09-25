@@ -139,17 +139,17 @@
               type="button"
               class="booking-close"
               id="bookingClose"
-              aria-label="SchlieÃŸen"
+              aria-label="Schließen"
             >
-              Ã—
+              ×
             </button>
   
             <div class="booking-header">
-              <div class="booking-icon">âœ“</div>
+              <div class="booking-icon">✓</div>
               <div>
                 <div class="booking-eyebrow">REIFENSERVICE HEIDELBERG</div>
                 <h2>Termin buchen</h2>
-                <p>WÃ¤hlen Sie Ihren Wunschtermin bequem online.</p>
+                <p>Wählen Sie Ihren Wunschtermin bequem online.</p>
               </div>
             </div>
   
@@ -197,7 +197,7 @@
                     name="bookingService"
                     required
                   >
-                    <option value="">Bitte auswÃ¤hlen</option>
+                    <option value="">Bitte auswählen</option>
                     <option value="Reifenwechsel">Reifenwechsel</option>
                     <option value="Reifenmontage">Reifenmontage</option>
                     <option value="Auswuchten">Auswuchten</option>
@@ -218,7 +218,7 @@
                 <div class="booking-section-title">
                   <span>1</span>
                   <div>
-                    <strong>Datum auswÃ¤hlen</strong>
+                    <strong>Datum auswählen</strong>
                     <small>Sonntag geschlossen</small>
                   </div>
                 </div>
@@ -231,7 +231,7 @@
                       id="prevMonth"
                       class="calendar-arrow"
                     >
-                      â€¹
+                      ‹
                     </button>
   
                     <strong id="calendarTitle"></strong>
@@ -241,7 +241,7 @@
                       id="nextMonth"
                       class="calendar-arrow"
                     >
-                      â€º
+                      ›
                     </button>
                   </div>
   
@@ -269,9 +269,9 @@
                 <div class="booking-section-title">
                   <span>2</span>
                   <div>
-                    <strong>Uhrzeit auswÃ¤hlen</strong>
+                    <strong>Uhrzeit auswählen</strong>
                     <small id="timeHint">
-                      Zuerst ein Datum auswÃ¤hlen
+                      Zuerst ein Datum auswählen
                     </small>
                   </div>
                 </div>
@@ -281,7 +281,7 @@
                   id="timeGrid"
                 >
                   <div class="time-empty">
-                    Bitte zuerst ein Datum auswÃ¤hlen.
+                    Bitte zuerst ein Datum auswählen.
                   </div>
                 </div>
   
@@ -312,17 +312,17 @@
   
                 <div class="summary-row">
                   <span>Datum</span>
-                  <strong id="summaryDate">â€“</strong>
+                  <strong id="summaryDate">–</strong>
                 </div>
   
                 <div class="summary-row">
                   <span>Uhrzeit</span>
-                  <strong id="summaryTime">â€“</strong>
+                  <strong id="summaryTime">–</strong>
                 </div>
   
                 <div class="summary-row">
                   <span>Leistung</span>
-                  <strong id="summaryService">â€“</strong>
+                  <strong id="summaryService">–</strong>
                 </div>
               </div>
   
@@ -337,12 +337,12 @@
                 id="bookingSubmit"
               >
                 <span>Termin anfragen</span>
-                <span>â†’</span>
+                <span>→</span>
               </button>
   
               <p class="booking-note">
                 Mit dem Absenden wird Ihre Terminanfrage gespeichert.
-                Die endgÃ¼ltige TerminbestÃ¤tigung erfolgt durch den Betrieb.
+                Die endgültige Terminbestätigung erfolgt durch den Betrieb.
               </p>
   
             </form>
@@ -617,13 +617,13 @@
       if (!selectedDate) {
         grid.innerHTML = `
           <div class="time-empty">
-            Bitte zuerst ein Datum auswÃ¤hlen.
+            Bitte zuerst ein Datum auswählen.
           </div>
         `;
   
         if (hint) {
           hint.textContent =
-            "Zuerst ein Datum auswÃ¤hlen";
+            "Zuerst ein Datum auswählen";
         }
   
         return;
@@ -648,8 +648,8 @@
       if (hint) {
         hint.textContent =
           day === 6
-            ? "Samstag: 08:00â€“18:00 Uhr"
-            : "Montagâ€“Freitag: 08:00â€“18:30 Uhr";
+            ? "Samstag: 08:00–18:00 Uhr"
+            : "Montag–Freitag: 08:00–18:30 Uhr";
       }
   
       slots.forEach(function (time) {
@@ -703,14 +703,14 @@
         dateElement.textContent =
           selectedDate
             ? formatGermanDate(selectedDate)
-            : "â€“";
+            : "–";
       }
   
       if (timeElement) {
         timeElement.textContent =
           selectedTime
             ? selectedTime + " Uhr"
-            : "â€“";
+            : "–";
       }
   
       const service =
@@ -720,7 +720,7 @@
         serviceElement.textContent =
           service && service.value
             ? service.value
-            : "â€“";
+            : "–";
       }
     }
   
@@ -768,7 +768,7 @@
   
       if (!name || !phone || !service) {
         showBookingError(
-          "Bitte fÃ¼llen Sie Name, Telefon und Leistung aus."
+          "Bitte füllen Sie Name, Telefon und Leistung aus."
         );
   
         return;
@@ -776,7 +776,7 @@
   
       if (!selectedDate) {
         showBookingError(
-          "Bitte wÃ¤hlen Sie ein Datum aus."
+          "Bitte wählen Sie ein Datum aus."
         );
   
         return;
@@ -784,7 +784,7 @@
   
       if (!selectedTime) {
         showBookingError(
-          "Bitte wÃ¤hlen Sie eine Uhrzeit aus."
+          "Bitte wählen Sie eine Uhrzeit aus."
         );
   
         return;
@@ -794,7 +794,7 @@
   
       if (selected.getDay() === 0) {
         showBookingError(
-          "Sonntag ist geschlossen. Bitte wÃ¤hlen Sie einen anderen Tag."
+          "Sonntag ist geschlossen. Bitte wählen Sie einen anderen Tag."
         );
   
         return;
@@ -869,14 +869,14 @@
         );
   
         showBookingError(
-          "Die Verbindung zum Buchungssystem konnte nicht hergestellt werden. Bitte prÃ¼fen Sie, ob der Server lÃ¤uft."
+          "Die Verbindung zum Buchungssystem konnte nicht hergestellt werden. Bitte prüfen Sie, ob der Server läuft."
         );
   
         if (submitButton) {
           submitButton.disabled = false;
   
           submitButton.innerHTML =
-            "<span>Termin anfragen</span><span>â†’</span>";
+            "<span>Termin anfragen</span><span>→</span>";
         }
       }
     }
@@ -924,13 +924,13 @@
               type="button"
               class="success-close"
               id="successClose"
-              aria-label="SchlieÃŸen"
+              aria-label="Schließen"
             >
-              Ã—
+              ×
             </button>
   
             <div class="success-check">
-              âœ“
+              ✓
             </div>
   
             <div class="success-eyebrow">
@@ -956,7 +956,7 @@
               </strong>
   
               <small>
-                Bitte bewahren Sie diese Buchungsnummer fÃ¼r Ihre Anfrage auf.
+                Bitte bewahren Sie diese Buchungsnummer für Ihre Anfrage auf.
               </small>
   
             </div>
@@ -990,7 +990,7 @@
               class="whatsapp-button"
               id="sendWhatsApp"
             >
-              <span class="whatsapp-symbol">â—‰</span>Termin per WhatsApp senden
+              <span class="whatsapp-symbol">◉</span>Termin per WhatsApp senden
             </button>
   
             <button
@@ -998,12 +998,12 @@
               class="success-secondary"
               id="successClose2"
             >
-              SchlieÃŸen
+              Schließen
             </button>
   
             <p class="success-note">
-              Die WhatsApp-Nachricht wird auf Ihrem GerÃ¤t vorbereitet.
-              Zum Absenden mÃ¼ssen Sie in WhatsApp noch auf â€žSendenâ€œ drÃ¼cken.
+              Die WhatsApp-Nachricht wird auf Ihrem Gerät vorbereitet.
+              Zum Absenden müssen Sie in WhatsApp noch auf „Senden“ drücken.
             </p>
   
           </div>
@@ -1101,7 +1101,7 @@
     ) {
       /*
         Deliberately no emojis here.
-        This avoids the broken "ï¿½" characters
+        This avoids the broken "�" characters
         that appeared in the previous WhatsApp test.
       */
   
@@ -1121,7 +1121,7 @@
         "Nachricht:",
         booking.message || "-",
         "",
-        "Mit freundlichen GrÃ¼ÃŸen",
+        "Mit freundlichen Grüßen",
         "Reifenservice Heidelberg"
       ].join("\n");
   
@@ -1880,4 +1880,5 @@
     );
   
   })();
+
 
