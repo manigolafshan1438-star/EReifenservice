@@ -1883,3 +1883,205 @@
 
 
 
+/* =========================
+   BOOKING FIXES
+========================= */
+
+(function () {
+
+  const GERMAN_PHONE =
+    /^(?:\+49|0049|0)\s?1[5-7]\d(?:[\s-]?\d){7,9}$/;
+
+  function validGermanPhone(value) {
+    return GERMAN_PHONE.test(
+      String(value || "").trim()
+    );
+  }
+
+  /* German phone validation */
+  document.addEventListener("submit", function (e) {
+
+    const form = e.target;
+
+    if (!form || !form.querySelector) return;
+
+    const phone =
+      form.querySelector(
+        'input[type="tel"], input[name*="phone" i], input[name*="telefon" i]'
+      );
+
+    if (!phone) return;
+
+    phone.setAttribute("required", "required");
+
+    if (!validGermanPhone(phone.value)) {
+
+      e.preventDefault();
+      e.stopImmediatePropagation();
+
+      phone.focus();
+
+      phone.setCustomValidity(
+        "Bitte geben Sie eine gültige deutsche Telefonnummer ein."
+      );
+
+      if (typeof phone.reportValidity === "function") {
+        phone.reportValidity();
+      }
+
+      setTimeout(() => {
+        phone.setCustomValidity("");
+      }, 100);
+
+      return false;
+    }
+
+  }, true);
+
+
+  /* WhatsApp button text */
+  function fixWhatsAppText() {
+
+    document.querySelectorAll("button, a").forEach(function (el) {
+
+      const text =
+        (el.textContent || "").trim();
+
+      if (
+        text.includes("WhatsApp") &&
+        text.includes("senden")
+      ) {
+
+        el.textContent =
+          "Termin per WhatsApp senden";
+
+      }
+
+    });
+
+  }
+
+
+  /* Load occupied times */
+  async function updateBookedSlots(date) {
+
+    if (!date) return;
+
+    try {
+
+      const response =
+        await fetch(
+          API_URL +
+          "/api/bookings/slots?date=" +
+          encodeURIComponent(date)
+        );
+
+      if (!response.ok) return;
+
+      const data =
+        await response.json();
+
+      if (
+        !data ||
+        !Array.isArray(data.bookedTimes)
+      ) return;
+
+      const booked =
+        data.bookedTimes.map(
+          t => String(t).trim()
+        );
+
+      document.querySelectorAll(
+        "button, .time-slot, [data-time]"
+      ).forEach(function (el) {
+
+        const time =
+          el.dataset.time ||
+          el.getAttribute("data-value") ||
+          el.textContent.trim();
+
+        const normalized =
+          String(time)
+            .replace(" Uhr", "")
+            .trim();
+
+        if (!booked.includes(normalized)) {
+          return;
+        }
+
+        el.disabled = true;
+        el.classList.add("booked");
+        el.setAttribute(
+          "aria-disabled",
+          "true"
+        );
+        el.title = "Dieser Termin ist bereits vergeben.";
+
+        if (
+          !el.textContent.includes("Belegt")
+        ) {
+
+          const original =
+            el.textContent.trim();
+
+          el.textContent =
+            original + " – Belegt";
+
+        }
+
+      });
+
+    } catch (error) {
+
+      console.error(
+        "Booked slots error:",
+        error
+      );
+
+    }
+
+  }
+
+
+  /* Watch date changes */
+  document.addEventListener(
+    "change",
+    function (e) {
+
+      const el = e.target;
+
+      if (!el) return;
+
+      if (
+        el.type === "date" ||
+        el.name === "date" ||
+        el.name === "booking_date"
+      ) {
+
+        updateBookedSlots(
+          el.value
+        );
+
+      }
+
+    }
+  );
+
+
+  /* Keep WhatsApp text correct */
+  const observer =
+    new MutationObserver(function () {
+      fixWhatsAppText();
+    });
+
+  observer.observe(
+    document.body,
+    {
+      childList: true,
+      subtree: true
+    }
+  );
+
+  fixWhatsAppText();
+
+})();
