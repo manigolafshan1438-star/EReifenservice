@@ -990,7 +990,7 @@
               class="whatsapp-button"
               id="sendWhatsApp"
             >
-              <span class="whatsapp-symbol">◉</span>Termin per WhatsApp senden
+              <span class="whatsapp-symbol">◉</span>Termin per Termin per WhatsApp senden
             </button>
   
             <button
@@ -1880,5 +1880,6 @@
     );
   
   })();
+
 
 
