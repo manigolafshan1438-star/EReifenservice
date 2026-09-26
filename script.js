@@ -11,7 +11,7 @@
        SETTINGS
     ========================= */
   
-    const API_URL = "https://ereifenservice.onrender.com";
+    const API_URL = "https://ereifenservice-1.onrender.com";
     const WHATSAPP_NUMBER = "4917663047915";
   
     const BUSINESS_HOURS = {
@@ -990,7 +990,7 @@
               class="whatsapp-button"
               id="sendWhatsApp"
             >
-              <span class="whatsapp-symbol">◉</span>Termin per Termin per WhatsApp senden
+              <span class="whatsapp-symbol">◉</span>Termin per WhatsApp senden
             </button>
   
             <button
@@ -2085,3 +2085,4 @@
   fixWhatsAppText();
 
 })();
+
