@@ -1,13 +1,16 @@
 ﻿/* =========================================================
    REIFENSERVICE HEIDELBERG
-   COMPLETE FRONTEND SCRIPT
-   Booking + Calendar + Backend + WhatsApp
+   COMPLETE BOOKING SCRIPT
    ========================================================= */
 
    (function () {
     "use strict";
   
-    const API_URL = "https://ereifenservice-1.onrender.com";
+    /* =========================
+       SETTINGS
+    ========================= */
+  
+    const API_URL = "https://ereifenservice.onrender.com";
     const WHATSAPP_NUMBER = "4917663047915";
   
     const BUSINESS_HOURS = {
@@ -20,37 +23,29 @@
       6: createTimeSlots("08:00", "18:00", 30)
     };
   
-    let bookingModal = null;
-    let selectedDate = null;
-    let selectedTime = null;
-    let bookedSlots = [];
-    let currentMonth = new Date();
-  
     function createTimeSlots(start, end, interval) {
-      const slots = [];
+      const result = [];
   
       let [hour, minute] = start.split(":").map(Number);
       const [endHour, endMinute] = end.split(":").map(Number);
   
       let current = hour * 60 + minute;
-      const endMinutes = endHour * 60 + endMinute;
+      const endValue = endHour * 60 + endMinute;
   
-      while (current <= endMinutes) {
-        slots.push(
-          String(Math.floor(current / 60)).padStart(2, "0") +
-          ":" +
-          String(current % 60).padStart(2, "0")
-        );
+      while (current <= endValue) {
+        const h = String(Math.floor(current / 60)).padStart(2, "0");
+        const m = String(current % 60).padStart(2, "0");
   
+        result.push(`${h}:${m}`);
         current += interval;
       }
   
-      return slots;
+      return result;
     }
   
-    /* =========================================================
+    /* =========================
        MOBILE MENU
-       ========================================================= */
+    ========================= */
   
     const menuBtn = document.getElementById("menuBtn");
     const nav = document.getElementById("nav");
@@ -69,9 +64,9 @@
       });
     }
   
-    /* =========================================================
+    /* =========================
        CONTACT FORM
-       ========================================================= */
+    ========================= */
   
     const kontaktForm = document.getElementById("kontaktForm");
   
@@ -86,7 +81,7 @@
         const leistung = getValue("leistung");
         const msg = getValue("msg");
   
-        const body = [
+        const lines = [
           "Name: " + name,
           "Telefon: " + tel,
           "Fahrzeug: " + fahrzeug,
@@ -95,27 +90,37 @@
           "",
           "Nachricht:",
           msg
-        ].join("\n");
+        ];
+  
+        const subject =
+          "Terminanfrage Reifenservice Heidelberg - " +
+          (leistung || "Service");
   
         window.location.href =
           "mailto:info@autoverkaufen-bw.de?subject=" +
-          encodeURIComponent(
-            "Terminanfrage Reifenservice Heidelberg - " +
-            (leistung || "Service")
-          ) +
+          encodeURIComponent(subject) +
           "&body=" +
-          encodeURIComponent(body);
+          encodeURIComponent(lines.join("\n"));
       });
     }
   
     function getValue(name) {
-      const el = document.querySelector(`[name="${name}"]`);
-      return el ? el.value.trim() : "";
+      const element = document.querySelector(`[name="${name}"]`);
+      return element ? element.value.trim() : "";
     }
   
-    /* =========================================================
-       BOOKING MODAL
-       ========================================================= */
+    /* =========================
+       BOOKING VARIABLES
+    ========================= */
+  
+    let bookingModal = null;
+    let selectedDate = null;
+    let selectedTime = null;
+    let currentMonth = new Date();
+  
+    /* =========================
+       CREATE BOOKING MODAL
+    ========================= */
   
     function createBookingModal() {
       if (bookingModal) return;
@@ -125,6 +130,7 @@
   
       bookingModal.innerHTML = `
         <div class="booking-overlay">
+  
           <div class="booking-card">
   
             <button
@@ -135,6 +141,7 @@
             >×</button>
   
             <div class="booking-header">
+  
               <div class="booking-icon">✓</div>
   
               <div>
@@ -148,6 +155,7 @@
                   Wählen Sie Ihren Wunschtermin bequem online.
                 </p>
               </div>
+  
             </div>
   
             <form id="bookingForm">
@@ -177,8 +185,9 @@
                     id="bookingPhone"
                     name="bookingPhone"
                     type="tel"
-                    placeholder="+49 176 12345678"
+                    inputmode="tel"
                     autocomplete="tel"
+                    placeholder="+49 176 12345678"
                     required
                   >
                 </div>
@@ -241,12 +250,19 @@
               <div class="booking-section">
   
                 <div class="booking-section-title">
+  
                   <span>1</span>
   
                   <div>
-                    <strong>Datum auswählen</strong>
-                    <small>Sonntag geschlossen</small>
+                    <strong>
+                      Datum auswählen
+                    </strong>
+  
+                    <small>
+                      Sonntag geschlossen
+                    </small>
                   </div>
+  
                 </div>
   
                 <div class="calendar">
@@ -285,20 +301,25 @@
                   ></div>
   
                 </div>
+  
               </div>
   
               <div class="booking-section">
   
                 <div class="booking-section-title">
+  
                   <span>2</span>
   
                   <div>
-                    <strong>Uhrzeit auswählen</strong>
+                    <strong>
+                      Uhrzeit auswählen
+                    </strong>
   
                     <small id="timeHint">
                       Zuerst ein Datum auswählen
                     </small>
                   </div>
+  
                 </div>
   
                 <div
@@ -312,7 +333,7 @@
   
               </div>
   
-              <div class="booking-field booking-message">
+              <div class="booking-field">
   
                 <label for="bookingMessage">
                   Nachricht
@@ -322,7 +343,7 @@
                   id="bookingMessage"
                   name="bookingMessage"
                   rows="4"
-                  placeholder="Optional: weitere Informationen zu Ihrem Fahrzeug oder Termin..."
+                  placeholder="Optional: weitere Informationen..."
                 ></textarea>
   
               </div>
@@ -375,6 +396,7 @@
             </form>
   
           </div>
+  
         </div>
       `;
   
@@ -384,9 +406,9 @@
       renderCalendar();
     }
   
-    /* =========================================================
+    /* =========================
        BOOKING EVENTS
-       ========================================================= */
+    ========================= */
   
     function setupBookingEvents() {
       const close = document.getElementById("bookingClose");
@@ -400,55 +422,42 @@
   
       if (prev) {
         prev.addEventListener("click", function () {
-          currentMonth.setMonth(
-            currentMonth.getMonth() - 1
-          );
-  
+          currentMonth.setMonth(currentMonth.getMonth() - 1);
           renderCalendar();
         });
       }
   
       if (next) {
         next.addEventListener("click", function () {
-          currentMonth.setMonth(
-            currentMonth.getMonth() + 1
-          );
-  
+          currentMonth.setMonth(currentMonth.getMonth() + 1);
           renderCalendar();
         });
       }
   
       if (form) {
-        form.addEventListener(
-          "submit",
-          submitBooking
-        );
+        form.addEventListener("submit", submitBooking);
       }
   
-      bookingModal.addEventListener(
-        "click",
-        function (event) {
-          if (
-            event.target.classList.contains(
-              "booking-overlay"
-            )
-          ) {
-            closeBooking();
-          }
+      bookingModal.addEventListener("click", function (event) {
+        if (
+          event.target.classList.contains(
+            "booking-overlay"
+          )
+        ) {
+          closeBooking();
         }
-      );
+      });
     }
   
-    /* =========================================================
+    /* =========================
        OPEN BOOKING
-       ========================================================= */
+    ========================= */
   
     function openBooking() {
       createBookingModal();
   
       selectedDate = null;
       selectedTime = null;
-      bookedSlots = [];
   
       currentMonth = new Date();
       currentMonth.setDate(1);
@@ -462,11 +471,10 @@
       updateSummary();
   
       setTimeout(function () {
-        const input =
-          document.getElementById("bookingName");
+        const name = document.getElementById("bookingName");
   
-        if (input) {
-          input.focus();
+        if (name) {
+          name.focus();
         }
       }, 100);
     }
@@ -479,71 +487,56 @@
       document.body.style.overflow = "";
     }
   
-    /* =========================================================
+    /* =========================
        BOOKING BUTTONS
-       ========================================================= */
+    ========================= */
   
-    document.addEventListener(
-      "click",
-      function (event) {
-        const button =
-          event.target.closest(
-            "[data-termin], .mobile-bar .cal, .mbar .sq"
-          );
+    document.addEventListener("click", function (event) {
+      const button = event.target.closest(
+        '[data-termin], .mobile-bar .cal, .mbar .sq'
+      );
   
-        if (!button) return;
+      if (!button) return;
   
+      event.preventDefault();
+  
+      openBooking();
+    });
+  
+    document.addEventListener("click", function (event) {
+      const link = event.target.closest(
+        'a[href="#kontakt"]'
+      );
+  
+      if (!link) return;
+  
+      const text =
+        (link.textContent || "").toLowerCase();
+  
+      if (
+        text.includes("termin") ||
+        text.includes("beratung")
+      ) {
         event.preventDefault();
-  
         openBooking();
       }
-    );
+    });
   
-    document.addEventListener(
-      "click",
-      function (event) {
-        const button =
-          event.target.closest(
-            'a[href="#kontakt"]'
-          );
-  
-        if (!button) return;
-  
-        const text =
-          (button.textContent || "").toLowerCase();
-  
-        if (
-          text.includes("termin") ||
-          text.includes("beratung")
-        ) {
-          event.preventDefault();
-          openBooking();
-        }
-      }
-    );
-  
-    /* =========================================================
+    /* =========================
        CALENDAR
-       ========================================================= */
+    ========================= */
   
     function renderCalendar() {
       const title =
-        document.getElementById(
-          "calendarTitle"
-        );
+        document.getElementById("calendarTitle");
   
       const container =
-        document.getElementById(
-          "calendarDays"
-        );
+        document.getElementById("calendarDays");
   
       if (!title || !container) return;
   
-      const year =
-        currentMonth.getFullYear();
-  
-      const month =
-        currentMonth.getMonth();
+      const year = currentMonth.getFullYear();
+      const month = currentMonth.getMonth();
   
       const monthName =
         new Intl.DateTimeFormat(
@@ -571,11 +564,7 @@
           ? 6
           : weekday - 1;
   
-      for (
-        let i = 0;
-        i < weekday;
-        i++
-      ) {
+      for (let i = 0; i < weekday; i++) {
         const empty =
           document.createElement("span");
   
@@ -606,6 +595,7 @@
         day <= daysInMonth;
         day++
       ) {
+  
         const date =
           new Date(
             year,
@@ -621,15 +611,10 @@
         );
   
         const button =
-          document.createElement(
-            "button"
-          );
+          document.createElement("button");
   
         button.type = "button";
-  
-        button.className =
-          "calendar-day";
-  
+        button.className = "calendar-day";
         button.textContent = day;
   
         const dateString =
@@ -638,80 +623,62 @@
         button.dataset.date =
           dateString;
   
-        const isSunday =
+        const sunday =
           date.getDay() === 0;
   
-        const isPast =
+        const past =
           date < today;
   
-        if (
-          isSunday ||
-          isPast
-        ) {
+        if (sunday || past) {
           button.disabled = true;
-          button.classList.add(
-            "disabled"
-          );
+          button.classList.add("disabled");
         }
   
         if (
           date.getTime() ===
           today.getTime()
         ) {
-          button.classList.add(
-            "today"
-          );
+          button.classList.add("today");
         }
   
         if (
           selectedDate ===
           dateString
         ) {
-          button.classList.add(
-            "selected"
-          );
+          button.classList.add("selected");
         }
   
         button.addEventListener(
           "click",
           function () {
-            selectDate(
-              dateString
-            );
+            selectDate(dateString);
           }
         );
   
-        container.appendChild(
-          button
-        );
+        container.appendChild(button);
       }
     }
   
-    async function selectDate(dateString) {
+    function selectDate(dateString) {
       selectedDate = dateString;
       selectedTime = null;
-      bookedSlots = [];
   
       renderCalendar();
       renderTimes();
       updateSummary();
-  
-      await loadBookedSlots(
-        dateString
-      );
     }
   
-    /* =========================================================
+    /* =========================
        LOAD BOOKED SLOTS
-       ========================================================= */
+    ========================= */
   
-    async function loadBookedSlots(date) {
+    async function getBookedTimes(date) {
       try {
         const response =
           await fetch(
             API_URL +
-              "/api/bookings/slots?date=" +
-              encodeURIComponent(date),
+            "/api/bookings/slots?date=" +
+            encodeURIComponent(date),
             {
               method: "GET",
               cache: "no-store"
@@ -719,40 +686,44 @@
           );
   
         if (!response.ok) {
-          throw new Error(
-            "Slots konnten nicht geladen werden."
-          );
+          return [];
         }
   
         const data =
           await response.json();
   
-        bookedSlots =
-          Array.isArray(
+        if (
+          !data ||
+          !Array.isArray(
             data.bookedTimes
           )
-            ? data.bookedTimes
-            : [];
+        ) {
+          return [];
+        }
   
-        renderTimes();
+        return data.bookedTimes.map(
+          function (time) {
+            return String(time)
+              .trim()
+              .substring(0, 5);
+          }
+        );
   
       } catch (error) {
         console.error(
-          "Slot loading error:",
+          "Slots error:",
           error
         );
   
-        bookedSlots = [];
-  
-        renderTimes();
+        return [];
       }
     }
   
-    /* =========================================================
+    /* =========================
        TIME SLOTS
-       ========================================================= */
+    ========================= */
   
-    function renderTimes() {
+    async function renderTimes() {
       const grid =
         document.getElementById(
           "timeGrid"
@@ -768,6 +739,7 @@
       grid.innerHTML = "";
   
       if (!selectedDate) {
+  
         grid.innerHTML = `
           <div class="time-empty">
             Bitte zuerst ein Datum auswählen.
@@ -794,6 +766,7 @@
         BUSINESS_HOURS[day] || [];
   
       if (!slots.length) {
+  
         grid.innerHTML = `
           <div class="time-empty">
             An diesem Tag ist der Betrieb geschlossen.
@@ -810,49 +783,63 @@
             : "Montag–Freitag: 08:00–18:30 Uhr";
       }
   
+      grid.innerHTML = `
+        <div class="time-empty">
+          Uhrzeiten werden geladen...
+        </div>
+      `;
+  
+      const booked =
+        await getBookedTimes(
+          selectedDate
+        );
+  
+      grid.innerHTML = "";
+  
       slots.forEach(
         function (time) {
+  
           const button =
             document.createElement(
               "button"
             );
   
           button.type = "button";
-  
           button.className =
             "time-button";
   
           button.textContent =
             time;
   
-          const isBooked =
-            bookedSlots.some(
-              function (booked) {
-                return normalizeTime(
-                  booked
-                ) ===
-                  normalizeTime(
-                    time
-                  );
-              }
-            );
+          button.dataset.time =
+            time;
   
-          if (isBooked) {
+          if (
+            booked.includes(time)
+          ) {
+  
             button.disabled = true;
   
             button.classList.add(
-              "disabled",
               "booked"
             );
   
             button.textContent =
               time + " – Belegt";
+  
+            button.title =
+              "Dieser Termin ist bereits vergeben.";
+  
+            button.setAttribute(
+              "aria-disabled",
+              "true"
+            );
+  
+            return;
           }
   
           if (
-            selectedTime ===
-              time &&
-            !isBooked
+            selectedTime === time
           ) {
             button.classList.add(
               "selected"
@@ -862,11 +849,6 @@
           button.addEventListener(
             "click",
             function () {
-              if (
-                button.disabled
-              ) {
-                return;
-              }
   
               selectedTime =
                 time;
@@ -896,21 +878,27 @@
           );
         }
       );
+  
+      if (
+        !grid.querySelector(
+          ".time-button:not(.booked)"
+        )
+      ) {
+  
+        grid.innerHTML = `
+          <div class="time-empty">
+            Für diesen Tag sind leider keine Termine mehr verfügbar.
+          </div>
+        `;
+      }
     }
   
-    function normalizeTime(time) {
-      if (!time) return "";
-  
-      return String(time)
-        .trim()
-        .slice(0, 5);
-    }
-  
-    /* =========================================================
+    /* =========================
        SUMMARY
-       ========================================================= */
+    ========================= */
   
     function updateSummary() {
+  
       const dateElement =
         document.getElementById(
           "summaryDate"
@@ -938,8 +926,7 @@
       if (timeElement) {
         timeElement.textContent =
           selectedTime
-            ? selectedTime +
-              " Uhr"
+            ? selectedTime + " Uhr"
             : "–";
       }
   
@@ -960,6 +947,7 @@
     document.addEventListener(
       "change",
       function (event) {
+  
         if (
           event.target &&
           event.target.id ===
@@ -970,11 +958,35 @@
       }
     );
   
-    /* =========================================================
-       SUBMIT BOOKING
-       ========================================================= */
+    /* =========================
+       GERMAN PHONE VALIDATION
+    ========================= */
   
-    async function submitBooking(event) {
+    function isValidGermanPhone(
+      phone
+    ) {
+  
+      const cleaned =
+        String(phone || "")
+          .trim()
+          .replace(
+            /[\s()-]/g,
+            ""
+          );
+  
+      return /^(?:\+49|0049|0)1[5-7]\d{8,9}$/.test(
+        cleaned
+      );
+    }
+  
+    /* =========================
+       SUBMIT BOOKING
+    ========================= */
+  
+    async function submitBooking(
+      event
+    ) {
+  
       event.preventDefault();
   
       const errorBox =
@@ -1024,6 +1036,7 @@
         !phone ||
         !service
       ) {
+  
         showBookingError(
           "Bitte füllen Sie Name, Telefon und Leistung aus."
         );
@@ -1036,14 +1049,16 @@
           phone
         )
       ) {
+  
         showBookingError(
-          "Bitte geben Sie eine gültige deutsche Telefonnummer ein, z. B. 0176 12345678 oder +49 176 12345678."
+          "Bitte geben Sie eine gültige deutsche Telefonnummer ein."
         );
   
         return;
       }
   
       if (!selectedDate) {
+  
         showBookingError(
           "Bitte wählen Sie ein Datum aus."
         );
@@ -1052,33 +1067,9 @@
       }
   
       if (!selectedTime) {
+  
         showBookingError(
           "Bitte wählen Sie eine Uhrzeit aus."
-        );
-  
-        return;
-      }
-  
-      if (
-        bookedSlots.some(
-          function (time) {
-            return (
-              normalizeTime(
-                time
-              ) ===
-              normalizeTime(
-                selectedTime
-              )
-            );
-          }
-        )
-      ) {
-        showBookingError(
-          "Dieser Termin ist bereits vergeben. Bitte wählen Sie eine andere Uhrzeit."
-        );
-  
-        await loadBookedSlots(
-          selectedDate
         );
   
         return;
@@ -1092,6 +1083,7 @@
       if (
         selected.getDay() === 0
       ) {
+  
         showBookingError(
           "Sonntag ist geschlossen. Bitte wählen Sie einen anderen Tag."
         );
@@ -1100,6 +1092,7 @@
       }
   
       if (submitButton) {
+  
         submitButton.disabled =
           true;
   
@@ -1117,11 +1110,14 @@
         message
       };
   
+      let timeoutId = null;
+  
       try {
+  
         const controller =
           new AbortController();
   
-        const timeout =
+        timeoutId =
           setTimeout(
             function () {
               controller.abort();
@@ -1129,60 +1125,60 @@
             15000
           );
   
-        let response;
+        const response =
+          await fetch(
+            API_URL +
+            "/api/bookings",
+            {
+              method: "POST",
   
-        try {
-          response =
-            await fetch(
-              API_URL +
-                "/api/bookings",
-              {
-                method: "POST",
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
   
-                headers: {
-                  "Content-Type":
-                    "application/json"
-                },
+              body:
+                JSON.stringify(
+                  bookingData
+                ),
   
-                body:
-                  JSON.stringify(
-                    bookingData
-                  ),
-  
-                signal:
-                  controller.signal
-              }
-            );
-        } finally {
-          clearTimeout(
-            timeout
+              signal:
+                controller.signal
+            }
           );
-        }
+  
+        clearTimeout(
+          timeoutId
+        );
   
         let data = null;
   
         try {
           data =
             await response.json();
-        } catch {
+        } catch (error) {
           data = null;
         }
   
         if (!response.ok) {
+  
           throw new Error(
             data?.message ||
-              "Die Terminanfrage konnte nicht gespeichert werden."
+            "Die Terminanfrage konnte nicht gespeichert werden."
           );
         }
   
+        /* IMPORTANT:
+           NEVER create a fake tracking code.
+        */
+  
         const trackingCode =
-          data?.trackingCode ||
-          data?.booking
-            ?.trackingCode;
+          data?.trackingCode;
   
         if (!trackingCode) {
+  
           throw new Error(
-            "Die Buchung wurde nicht mit einer gültigen Buchungsnummer bestätigt."
+            "Die Buchungsnummer konnte nicht vom Server abgerufen werden."
           );
         }
   
@@ -1194,25 +1190,32 @@
         );
   
       } catch (error) {
+  
+        if (timeoutId) {
+          clearTimeout(
+            timeoutId
+          );
+        }
+  
         console.error(
           "Booking error:",
           error
         );
   
         let message =
-          "Die Terminanfrage konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.";
+          "Die Buchung konnte nicht gespeichert werden.";
   
         if (
           error?.name ===
           "AbortError"
         ) {
+  
           message =
-            "Der Server antwortet zu langsam. Bitte versuchen Sie es in wenigen Sekunden erneut.";
+            "Der Server antwortet zu langsam. Bitte versuchen Sie es erneut.";
         } else if (
-          error?.message &&
-          error.message.length <
-            250
+          error?.message
         ) {
+  
           message =
             error.message;
         }
@@ -1222,6 +1225,7 @@
         );
   
         if (submitButton) {
+  
           submitButton.disabled =
             false;
   
@@ -1231,14 +1235,34 @@
       }
     }
   
-    /* =========================================================
+    function showBookingError(
+      message
+    ) {
+  
+      const errorBox =
+        document.getElementById(
+          "bookingError"
+        );
+  
+      if (!errorBox) return;
+  
+      errorBox.textContent =
+        message;
+  
+      errorBox.classList.add(
+        "show"
+      );
+    }
+  
+    /* =========================
        SUCCESS MODAL
-       ========================================================= */
+    ========================= */
   
     function showSuccessModal(
       booking,
       trackingCode
     ) {
+  
       const old =
         document.getElementById(
           "bookingSuccessModal"
@@ -1257,6 +1281,7 @@
         "bookingSuccessModal";
   
       modal.innerHTML = `
+  
         <div class="success-overlay">
   
           <div class="success-card">
@@ -1349,7 +1374,9 @@
               class="whatsapp-button"
               id="sendWhatsApp"
             >
-              <span class="whatsapp-symbol">◉</span>
+              <span class="whatsapp-symbol">
+                ◉
+              </span>
               Termin per WhatsApp senden
             </button>
   
@@ -1378,6 +1405,14 @@
       document.body.style.overflow =
         "hidden";
   
+      requestAnimationFrame(
+        function () {
+          modal.classList.add(
+            "show"
+          );
+        }
+      );
+  
       const close1 =
         document.getElementById(
           "successClose"
@@ -1386,11 +1421,6 @@
       const close2 =
         document.getElementById(
           "successClose2"
-        );
-  
-      const whatsapp =
-        document.getElementById(
-          "sendWhatsApp"
         );
   
       if (close1) {
@@ -1407,14 +1437,22 @@
         );
       }
   
+      const whatsapp =
+        document.getElementById(
+          "sendWhatsApp"
+        );
+  
       if (whatsapp) {
+  
         whatsapp.addEventListener(
           "click",
           function () {
+  
             openWhatsApp(
               booking,
               trackingCode
             );
+  
           }
         );
       }
@@ -1422,6 +1460,7 @@
       modal.addEventListener(
         "click",
         function (event) {
+  
           if (
             event.target.classList.contains(
               "success-overlay"
@@ -1429,11 +1468,13 @@
           ) {
             closeSuccessModal();
           }
+  
         }
       );
     }
   
     function closeSuccessModal() {
+  
       const modal =
         document.getElementById(
           "bookingSuccessModal"
@@ -1447,30 +1488,30 @@
         "";
     }
   
-    /* =========================================================
+    /* =========================
        WHATSAPP
-       ========================================================= */
+    ========================= */
   
     function openWhatsApp(
       booking,
       trackingCode
     ) {
+  
       const message = [
-        "Hallo Reifenservice Heidelberg,",
-        "",
-        "ich habe gerade eine Terminanfrage über Ihre Website gesendet.",
+        "Neue Terminanfrage",
         "",
         "Buchungsnummer: " +
           trackingCode,
+        "",
         "Name: " +
           booking.name,
         "Telefon: " +
           booking.phone,
         "Fahrzeug: " +
-          (booking.vehicle ||
-            "-"),
+          (booking.vehicle || "-"),
         "Leistung: " +
           booking.service,
+        "",
         "Datum: " +
           formatGermanDate(
             booking.date
@@ -1479,15 +1520,12 @@
           booking.time +
           " Uhr",
         "",
-        booking.message
-          ? "Nachricht: " +
-            booking.message
-          : "",
+        "Nachricht:",
+        booking.message || "-",
         "",
-        "Bitte bestätigen Sie meinen Termin."
-      ]
-        .filter(Boolean)
-        .join("\n");
+        "Mit freundlichen Grüßen",
+        "Reifenservice Heidelberg"
+      ].join("\n");
   
       const url =
         "https://wa.me/" +
@@ -1497,15 +1535,26 @@
           message
         );
   
-      const mobile =
-        /Android|iPhone|iPad|iPod/i.test(
+      /*
+        Mobile:
+        open directly in WhatsApp/browser.
+  
+        Desktop:
+        open new tab.
+      */
+  
+      const isMobile =
+        /Android|iPhone|iPad|iPod|Mobile/i.test(
           navigator.userAgent
         );
   
-      if (mobile) {
+      if (isMobile) {
+  
         window.location.href =
           url;
+  
       } else {
+  
         window.open(
           url,
           "_blank",
@@ -1514,55 +1563,14 @@
       }
     }
   
-    /* =========================================================
-       GERMAN PHONE VALIDATION
-       ========================================================= */
-  
-    function isValidGermanPhone(
-      phone
-    ) {
-      const cleaned =
-        String(phone || "")
-          .trim()
-          .replace(
-            /[\s()-]/g,
-            ""
-          );
-  
-      return /^(?:\+49|0049|0)1[5-7]\d{8,9}$/.test(
-        cleaned
-      );
-    }
-  
-    /* =========================================================
-       ERROR
-       ========================================================= */
-  
-    function showBookingError(
-      message
-    ) {
-      const errorBox =
-        document.getElementById(
-          "bookingError"
-        );
-  
-      if (!errorBox) return;
-  
-      errorBox.textContent =
-        message;
-  
-      errorBox.classList.add(
-        "show"
-      );
-    }
-  
-    /* =========================================================
+    /* =========================
        DATE HELPERS
-       ========================================================= */
+    ========================= */
   
     function formatDateISO(
       date
     ) {
+  
       const year =
         date.getFullYear();
   
@@ -1588,32 +1596,30 @@
     function parseDateISO(
       value
     ) {
-      const [
-        year,
-        month,
-        day
-      ] = value
-        .split("-")
-        .map(Number);
+  
+      const parts =
+        value
+          .split("-")
+          .map(Number);
   
       return new Date(
-        year,
-        month - 1,
-        day
+        parts[0],
+        parts[1] - 1,
+        parts[2]
       );
     }
   
     function formatGermanDate(
       value
     ) {
+  
       const date =
-        parseDateISO(
-          value
-        );
+        parseDateISO(value);
   
       return new Intl.DateTimeFormat(
         "de-DE",
         {
+          weekday: "long",
           day: "2-digit",
           month: "2-digit",
           year: "numeric"
@@ -1621,13 +1627,14 @@
       ).format(date);
     }
   
-    /* =========================================================
-       HTML ESCAPE
-       ========================================================= */
+    /* =========================
+       ESCAPE HTML
+    ========================= */
   
     function escapeHtml(
       value
     ) {
+  
       return String(
         value ?? ""
       )
@@ -1653,106 +1660,15 @@
         );
     }
   
-    /* =========================================================
-       EXTRA PHONE VALIDATION
-       ========================================================= */
-  
-    document.addEventListener(
-      "input",
-      function (event) {
-        const input =
-          event.target;
-  
-        if (
-          !input ||
-          input.type !== "tel"
-        ) {
-          return;
-        }
-  
-        input.setCustomValidity("");
-  
-        if (
-          input.value.trim() &&
-          !isValidGermanPhone(
-            input.value
-          )
-        ) {
-          input.setCustomValidity(
-            "Bitte geben Sie eine gültige deutsche Telefonnummer ein."
-          );
-        }
-      }
-    );
-  
-    /* =========================================================
-       WHATSAPP TEXT FIX
-       ========================================================= */
-  
-    function fixWhatsAppButtons() {
-      document
-        .querySelectorAll(
-          "button, a"
-        )
-        .forEach(
-          function (element) {
-            const text =
-              (
-                element.textContent ||
-                ""
-              ).trim();
-  
-            if (
-              text.includes(
-                "WhatsApp"
-              ) &&
-              text.includes(
-                "senden"
-              )
-            ) {
-              element.innerHTML =
-                '<span class="whatsapp-symbol">◉</span>Termin per WhatsApp senden';
-            }
-          }
-        );
-    }
-  
-    fixWhatsAppButtons();
-  
-    const observer =
-      new MutationObserver(
-        function () {
-          fixWhatsAppButtons();
-        }
-      );
-  
-    observer.observe(
-      document.body,
-      {
-        childList: true,
-        subtree: true
-      }
-    );
-  
-    /* =========================================================
-       START
-       ========================================================= */
-  
-    document.addEventListener(
-      "DOMContentLoaded",
-      function () {
-        injectBookingStyles();
-      }
-    );
-  
-    /* =========================================================
-       BOOKING STYLES
-       ========================================================= */
+    /* =========================
+       BOOKING CSS
+    ========================= */
   
     function injectBookingStyles() {
+  
       if (
         document.getElementById(
-          "bookingRuntimeStyles"
+          "bookingScriptStyles"
         )
       ) {
         return;
@@ -1764,102 +1680,117 @@
         );
   
       style.id =
-        "bookingRuntimeStyles";
+        "bookingScriptStyles";
   
       style.textContent = `
+  
         .booking-overlay,
         .success-overlay {
           position: fixed;
           inset: 0;
           z-index: 99999;
-          background: rgba(0,0,0,.78);
           display: flex;
           align-items: center;
           justify-content: center;
           padding: 20px;
+          background: rgba(0,0,0,.72);
+          backdrop-filter: blur(8px);
           overflow-y: auto;
         }
   
-        .booking-modal,
-        #bookingModal,
-        #bookingSuccessModal {
-          font-family: Arial, sans-serif;
+        #bookingModal {
+          position: fixed;
+          inset: 0;
+          z-index: 99999;
+          visibility: hidden;
+          opacity: 0;
+          transition: opacity .2s ease;
         }
   
-        .booking-card,
-        .success-card {
+        #bookingModal.show {
+          visibility: visible;
+          opacity: 1;
+        }
+  
+        .booking-card {
           position: relative;
-          width: min(920px, 100%);
+          width: min(760px,100%);
           max-height: 94vh;
           overflow-y: auto;
           background: #fff;
-          color: #111;
-          border-radius: 22px;
-          padding: 28px;
-          box-sizing: border-box;
-          box-shadow: 0 30px 90px rgba(0,0,0,.4);
+          border-radius: 24px;
+          padding: 30px;
+          box-shadow: 0 30px 100px rgba(0,0,0,.35);
+          transform: translateY(20px);
+          opacity: 0;
+          transition: .25s ease;
+        }
+  
+        #bookingModal.show .booking-card {
+          transform: translateY(0);
+          opacity: 1;
         }
   
         .booking-close,
         .success-close {
           position: absolute;
-          top: 14px;
-          right: 16px;
-          width: 42px;
-          height: 42px;
+          top: 15px;
+          right: 17px;
+          width: 40px;
+          height: 40px;
           border: 0;
           border-radius: 50%;
-          background: #f1f1f1;
+          background: #f1f3f5;
+          color: #222;
           font-size: 28px;
+          line-height: 1;
           cursor: pointer;
-          z-index: 5;
         }
   
         .booking-header {
           display: flex;
           gap: 16px;
           align-items: center;
-          margin-bottom: 25px;
+          margin-bottom: 26px;
+          padding-right: 40px;
         }
   
-        .booking-icon,
-        .success-check {
+        .booking-icon {
           width: 54px;
           height: 54px;
-          min-width: 54px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: #16a34a;
+          flex: 0 0 54px;
+          display: grid;
+          place-items: center;
+          border-radius: 16px;
+          background: #188f4d;
           color: #fff;
-          font-size: 28px;
-          font-weight: 700;
+          font-size: 25px;
+          font-weight: 800;
         }
   
         .booking-eyebrow,
         .success-eyebrow {
-          color: #16a34a;
-          font-size: 12px;
+          color: #188f4d;
+          font-size: 11px;
           font-weight: 800;
           letter-spacing: .12em;
         }
   
-        .booking-header h2,
-        .success-card h2 {
-          margin: 4px 0;
-          font-size: 28px;
+        .booking-header h2 {
+          margin: 3px 0;
+          color: #111827;
+          font-size: 30px;
         }
   
-        .booking-header p,
-        .success-text {
+        .booking-header p {
           margin: 0;
-          color: #666;
+          color: #68707d;
+          font-size: 14px;
         }
   
         .booking-grid {
           display: grid;
-          grid-template-columns: repeat(2, 1fr);
+          grid-template-columns: 1fr 1fr;
           gap: 16px;
         }
   
@@ -1870,205 +1801,246 @@
         .booking-field label {
           display: block;
           margin-bottom: 7px;
-          font-size: 14px;
+          color: #202631;
+          font-size: 13px;
           font-weight: 700;
         }
   
         .booking-field input,
         .booking-field select,
         .booking-field textarea {
-          width: 100%;
           box-sizing: border-box;
-          border: 1px solid #d7d7d7;
+          width: 100%;
+          border: 1px solid #d9dee5;
           border-radius: 12px;
-          padding: 13px 14px;
-          font-size: 15px;
-          outline: none;
           background: #fff;
+          color: #171a1f;
+          padding: 13px 14px;
+          font: inherit;
+          outline: none;
         }
   
         .booking-field input:focus,
         .booking-field select:focus,
         .booking-field textarea:focus {
-          border-color: #16a34a;
+          border-color: #188f4d;
+          box-shadow: 0 0 0 3px rgba(24,143,77,.10);
+        }
+  
+        .booking-field textarea {
+          resize: vertical;
+          min-height: 100px;
         }
   
         .booking-section {
-          margin-top: 22px;
+          margin-top: 14px;
+          margin-bottom: 24px;
         }
   
         .booking-section-title {
           display: flex;
           align-items: center;
-          gap: 12px;
-          margin-bottom: 14px;
+          gap: 10px;
+          margin-bottom: 13px;
         }
   
         .booking-section-title > span {
-          width: 32px;
-          height: 32px;
+          width: 29px;
+          height: 29px;
+          display: grid;
+          place-items: center;
           border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: #111;
+          background: #188f4d;
           color: #fff;
+          font-size: 13px;
           font-weight: 800;
         }
   
-        .booking-section-title strong,
-        .booking-section-title small {
+        .booking-section-title strong {
           display: block;
+          color: #171a1f;
+          font-size: 15px;
         }
   
         .booking-section-title small {
-          color: #777;
-          margin-top: 3px;
+          display: block;
+          margin-top: 2px;
+          color: #78818c;
+          font-size: 11px;
         }
   
         .calendar {
-          border: 1px solid #e1e1e1;
+          border: 1px solid #e2e6eb;
           border-radius: 16px;
-          overflow: hidden;
+          padding: 14px;
         }
   
         .calendar-head {
           display: flex;
-          justify-content: space-between;
           align-items: center;
-          padding: 13px 16px;
-          background: #f7f7f7;
+          justify-content: space-between;
+          margin-bottom: 14px;
+        }
+  
+        .calendar-head strong {
+          color: #15191f;
+          font-size: 15px;
         }
   
         .calendar-arrow {
-          width: 38px;
-          height: 38px;
+          width: 36px;
+          height: 36px;
           border: 0;
           border-radius: 10px;
-          background: #fff;
+          background: #f2f4f6;
+          color: #1d242b;
+          font-size: 23px;
           cursor: pointer;
-          font-size: 24px;
         }
   
         .calendar-weekdays,
         .calendar-days {
           display: grid;
-          grid-template-columns: repeat(7, 1fr);
-          gap: 6px;
-          padding: 10px;
+          grid-template-columns: repeat(7,1fr);
+          gap: 5px;
+        }
+  
+        .calendar-weekdays {
+          margin-bottom: 6px;
         }
   
         .calendar-weekdays span {
           text-align: center;
-          color: #777;
-          font-size: 12px;
-          font-weight: 700;
+          color: #7a838d;
+          font-size: 11px;
+          font-weight: 800;
+        }
+  
+        .calendar-day,
+        .calendar-empty {
+          min-height: 40px;
         }
   
         .calendar-day {
-          min-height: 42px;
-          border: 0;
+          border: 1px solid transparent;
           border-radius: 10px;
-          background: #f5f5f5;
+          background: #f7f8f9;
+          color: #252b32;
+          font-size: 13px;
           cursor: pointer;
-          font-weight: 600;
         }
   
         .calendar-day:hover:not(:disabled) {
-          background: #dcfce7;
+          border-color: #188f4d;
+          background: #f0faf4;
         }
   
         .calendar-day.today {
-          box-shadow: inset 0 0 0 2px #16a34a;
+          box-shadow: inset 0 0 0 1px #188f4d;
         }
   
         .calendar-day.selected {
-          background: #16a34a;
+          background: #188f4d;
           color: #fff;
+          font-weight: 800;
         }
   
-        .calendar-day.disabled {
-          opacity: .35;
+        .calendar-day:disabled {
           cursor: not-allowed;
-        }
-  
-        .calendar-empty {
-          min-height: 42px;
+          opacity: .28;
         }
   
         .time-grid {
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
+          grid-template-columns: repeat(4,1fr);
           gap: 8px;
         }
   
         .time-button {
-          border: 1px solid #ddd;
+          border: 1px solid #dfe4e9;
           border-radius: 10px;
-          padding: 11px 7px;
           background: #fff;
+          color: #20252b;
+          padding: 11px 6px;
+          font-size: 13px;
+          font-weight: 700;
           cursor: pointer;
-          font-weight: 600;
         }
   
         .time-button:hover:not(:disabled) {
-          border-color: #16a34a;
+          border-color: #188f4d;
+          background: #f0faf4;
         }
   
         .time-button.selected {
-          background: #16a34a;
+          border-color: #188f4d;
+          background: #188f4d;
           color: #fff;
-          border-color: #16a34a;
         }
   
         .time-button.booked,
         .time-button:disabled {
-          background: #f1f1f1;
+          background: #f1f2f3;
           color: #999;
+          border-color: #ddd;
           cursor: not-allowed;
-          text-decoration: line-through;
+          opacity: .65;
         }
   
         .time-empty {
           grid-column: 1 / -1;
           padding: 18px;
-          text-align: center;
-          color: #777;
-          background: #f7f7f7;
           border-radius: 12px;
+          background: #f5f6f7;
+          color: #747d87;
+          text-align: center;
+          font-size: 13px;
         }
   
         .booking-summary {
           margin-top: 20px;
           padding: 17px;
-          border-radius: 14px;
-          background: #f7f7f7;
+          border-radius: 15px;
+          background: #f5f7f8;
         }
   
         .summary-title {
-          font-weight: 800;
           margin-bottom: 10px;
+          color: #161a1e;
+          font-size: 13px;
+          font-weight: 800;
         }
   
         .summary-row {
           display: flex;
           justify-content: space-between;
-          gap: 20px;
-          padding: 5px 0;
+          gap: 15px;
+          padding: 6px 0;
+          border-bottom: 1px solid #e2e5e8;
+          font-size: 13px;
+        }
+  
+        .summary-row:last-child {
+          border-bottom: 0;
         }
   
         .summary-row span {
-          color: #777;
+          color: #737c86;
+        }
+  
+        .summary-row strong {
+          color: #1d2329;
+          text-align: right;
         }
   
         .booking-error {
           display: none;
-          margin-top: 15px;
+          margin-top: 14px;
           padding: 12px 14px;
-          border-radius: 10px;
-          background: #fee2e2;
-          color: #b91c1c;
-          font-size: 14px;
+          border-radius: 11px;
+          background: #fff0f0;
+          color: #b42318;
+          font-size: 13px;
         }
   
         .booking-error.show {
@@ -2077,17 +2049,22 @@
   
         .booking-submit {
           width: 100%;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
           margin-top: 18px;
           border: 0;
           border-radius: 13px;
-          padding: 15px 18px;
-          background: #16a34a;
+          background: #188f4d;
           color: #fff;
-          font-size: 16px;
+          padding: 15px 18px;
+          font-size: 15px;
           font-weight: 800;
-          display: flex;
-          justify-content: space-between;
           cursor: pointer;
+        }
+  
+        .booking-submit:hover {
+          background: #137940;
         }
   
         .booking-submit:disabled {
@@ -2095,89 +2072,139 @@
           cursor: wait;
         }
   
-        .booking-note,
-        .success-note {
+        .booking-note {
+          margin: 11px 0 0;
+          color: #7a828b;
           text-align: center;
-          color: #777;
-          font-size: 12px;
+          font-size: 11px;
           line-height: 1.5;
         }
   
+        #bookingSuccessModal {
+          position: fixed;
+          inset: 0;
+          z-index: 100000;
+        }
+  
+        .success-overlay {
+          opacity: 0;
+          transition: opacity .2s ease;
+        }
+  
+        #bookingSuccessModal.show .success-overlay {
+          opacity: 1;
+        }
+  
         .success-card {
-          max-width: 560px;
+          position: relative;
+          width: min(530px,100%);
+          max-height: 94vh;
+          overflow-y: auto;
+          padding: 35px;
+          border-radius: 25px;
+          background: #fff;
+          box-shadow: 0 30px 100px rgba(0,0,0,.35);
           text-align: center;
         }
   
         .success-check {
+          width: 65px;
+          height: 65px;
           margin: 0 auto 16px;
+          display: grid;
+          place-items: center;
+          border-radius: 50%;
+          background: #188f4d;
+          color: #fff;
+          font-size: 32px;
+          font-weight: 800;
+        }
+  
+        .success-card h2 {
+          margin: 5px 0 8px;
+          color: #15191f;
+          font-size: 30px;
+        }
+  
+        .success-text {
+          margin: 0 auto 20px;
+          max-width: 390px;
+          color: #6f7780;
+          font-size: 14px;
+          line-height: 1.6;
         }
   
         .tracking-box {
-          margin: 22px 0;
           padding: 18px;
           border-radius: 15px;
-          background: #ecfdf5;
-          border: 1px solid #bbf7d0;
-        }
-  
-        .tracking-box span,
-        .tracking-box small {
-          display: block;
+          background: #f3f6f4;
         }
   
         .tracking-box span {
-          font-size: 11px;
-          font-weight: 800;
-          color: #15803d;
+          display: block;
+          color: #188f4d;
+          font-size: 10px;
+          font-weight: 900;
+          letter-spacing: .12em;
         }
   
         .tracking-box strong {
           display: block;
-          margin: 8px 0;
+          margin: 7px 0;
+          color: #161b20;
           font-size: 28px;
           letter-spacing: .08em;
-          color: #166534;
         }
   
         .tracking-box small {
-          color: #4b5563;
+          color: #747d86;
+          font-size: 11px;
         }
   
         .success-details {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 10px;
+          margin: 17px 0;
+          padding: 4px 15px;
+          border-radius: 14px;
+          background: #f7f8f9;
           text-align: left;
-          margin-bottom: 18px;
         }
   
-        .success-details div {
-          padding: 12px;
-          background: #f7f7f7;
-          border-radius: 10px;
+        .success-details > div {
+          display: flex;
+          justify-content: space-between;
+          gap: 15px;
+          padding: 9px 0;
+          border-bottom: 1px solid #e5e8ea;
+          font-size: 13px;
         }
   
-        .success-details span,
-        .success-details strong {
-          display: block;
+        .success-details > div:last-child {
+          border-bottom: 0;
         }
   
         .success-details span {
-          color: #777;
-          font-size: 12px;
-          margin-bottom: 4px;
+          color: #7b838c;
+        }
+  
+        .success-details strong {
+          color: #22282e;
+          text-align: right;
         }
   
         .whatsapp-button {
           width: 100%;
           border: 0;
           border-radius: 13px;
-          padding: 15px;
           background: #25d366;
           color: #fff;
-          font-size: 16px;
+          padding: 15px;
+          font-size: 14px;
           font-weight: 800;
           cursor: pointer;
+        }
+  
+        .whatsapp-button:hover {
+          background: #20bd5a;
         }
   
         .whatsapp-symbol {
@@ -2186,16 +2213,25 @@
   
         .success-secondary {
           width: 100%;
-          margin-top: 10px;
-          padding: 13px;
-          border: 1px solid #ddd;
-          border-radius: 12px;
+          margin-top: 9px;
+          border: 1px solid #dce1e5;
+          border-radius: 13px;
           background: #fff;
-          cursor: pointer;
+          color: #252b31;
+          padding: 13px;
+          font-size: 13px;
           font-weight: 700;
+          cursor: pointer;
         }
   
-        @media (max-width: 700px) {
+        .success-note {
+          margin: 14px 0 0;
+          color: #818992;
+          font-size: 10px;
+          line-height: 1.5;
+        }
+  
+        @media (max-width:650px) {
   
           .booking-overlay,
           .success-overlay {
@@ -2203,21 +2239,24 @@
             padding: 10px;
           }
   
-          .booking-card,
-          .success-card {
-            width: 100%;
+          .booking-card {
             max-height: 96vh;
-            padding: 20px 14px;
-            border-radius: 17px;
+            padding: 22px 16px;
+            border-radius: 20px;
           }
   
           .booking-header {
-            padding-right: 35px;
+            margin-bottom: 18px;
           }
   
-          .booking-header h2,
-          .success-card h2 {
-            font-size: 22px;
+          .booking-header h2 {
+            font-size: 24px;
+          }
+  
+          .booking-icon {
+            width: 46px;
+            height: 46px;
+            flex-basis: 46px;
           }
   
           .booking-grid {
@@ -2225,37 +2264,46 @@
             gap: 0;
           }
   
-          .time-grid {
-            grid-template-columns: repeat(3, 1fr);
-          }
-  
-          .calendar-weekdays,
-          .calendar-days {
-            gap: 4px;
-            padding: 7px;
-          }
-  
           .calendar-day {
-            min-height: 38px;
+            min-height: 37px;
           }
   
-          .success-details {
-            grid-template-columns: 1fr;
+          .time-grid {
+            grid-template-columns: repeat(3,1fr);
+          }
+  
+          .success-card {
+            padding: 28px 18px;
+            border-radius: 20px;
+          }
+  
+          .success-card h2 {
+            font-size: 25px;
           }
   
           .tracking-box strong {
-            font-size: 23px;
-            word-break: break-word;
+            font-size: 24px;
+          }
+  
+          .success-details > div {
+            flex-direction: column;
+            gap: 3px;
+          }
+  
+          .success-details strong {
+            text-align: left;
           }
         }
   
-        @media (max-width: 420px) {
+        @media (max-width:390px) {
+  
           .time-grid {
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(2,1fr);
           }
   
-          .booking-card {
-            padding: 17px 11px;
+          .calendar-day {
+            min-height: 34px;
+            font-size: 12px;
           }
         }
       `;
@@ -2264,6 +2312,43 @@
         style
       );
     }
+  
+    /* =========================
+       ESC KEY
+    ========================= */
+  
+    document.addEventListener(
+      "keydown",
+      function (event) {
+  
+        if (
+          event.key !== "Escape"
+        ) {
+          return;
+        }
+  
+        if (
+          bookingModal &&
+          bookingModal.classList.contains(
+            "show"
+          )
+        ) {
+          closeBooking();
+        }
+  
+        if (
+          document.getElementById(
+            "bookingSuccessModal"
+          )
+        ) {
+          closeSuccessModal();
+        }
+      }
+    );
+  
+    /* =========================
+       START CSS
+    ========================= */
   
     injectBookingStyles();
   
