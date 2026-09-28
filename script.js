@@ -219,29 +219,22 @@
                       Bitte auswählen
                     </option>
   
-                    <option value="Reifenwechsel">
-                      Reifenwechsel
-                    </option>
-  
-                    <option value="Reifenmontage">
-                      Reifenmontage
-                    </option>
-  
-                    <option value="Auswuchten">
-                      Auswuchten
-                    </option>
-  
-                    <option value="Reifenverkauf">
-                      Reifenverkauf
-                    </option>
-  
-                    <option value="Reifenwechsel + Auswuchten">
-                      Reifenwechsel + Auswuchten
-                    </option>
-  
-                    <option value="Sonstige Anfrage">
-                      Sonstige Anfrage
-                    </option>
+                   <option value="Reifenwechsel">Reifenwechsel</option>
+<option value="Reifenmontage">Reifenmontage</option>
+<option value="Auswuchten">Auswuchten</option>
+<option value="Reifenverkauf">Reifenverkauf</option>
+<option value="Reifenwechsel + Auswuchten">
+  Reifenwechsel + Auswuchten
+</option>
+<option value="Auto-Service">Auto-Service</option>
+<option value="Ölwechsel">Ölwechsel</option>
+<option value="Klimaanlagen-Service">Klimaanlagen-Service</option>
+<option value="Auspuff-Service">Auspuff-Service</option>
+<option value="Fahrzeugaufbereitung">Fahrzeugaufbereitung</option>
+<option value="Automotordiagnose">Automotordiagnose</option>
+<option value="Sonstige Anfrage">
+  Sonstige Anfrage
+</option>
                   </select>
                 </div>
   
